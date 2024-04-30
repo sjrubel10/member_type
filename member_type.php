@@ -90,7 +90,7 @@ class MemberTypePlugin {
 
         //[team_members member_to_show='5' image_position='bottom' see_all_button='true' /]
         $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
-        $posts_per_page =  $shortcode_params['member_to_show']; // 5 posts per page for first page
+        $posts_per_page =  isset( $shortcode_params['member_to_show'] ) ? $shortcode_params['member_to_show'] : 5; // 5 posts per page for first page
 
         $query_args = array(
             'post_type' => 'team_member',
@@ -100,6 +100,8 @@ class MemberTypePlugin {
 
         $team_members_query = new WP_Query( $query_args );
 //        error_log( print_r( ['$team_members_query'=>$team_members_query], true ) );
+
+        //[team_members member_to_show='5' image_position='top' see_all_button=1 /]
 
         $output = '';
 
@@ -145,7 +147,7 @@ class MemberTypePlugin {
 
             // See All Button
             if ( $shortcode_params['see_all_button'] ) {
-                $output .= '<a href="' . get_post_type_archive_link('team_member') . '" class="see-all-button">See All Team Members</a>';
+                $output .= '<div class="see_all_btn"><a href="' . get_post_type_archive_link('team_member') . '" class="see-all-button">See All Team Members</a></div>';
             }
 
             wp_reset_postdata();
