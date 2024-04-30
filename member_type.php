@@ -4,7 +4,7 @@ Plugin Name: Member type
 Plugin URI:
 Description: Checks the health of your WordPress install
 Version: 1.0.0
-Author: Ruble Mia
+Author: sjrubel10
 Author URI:
 Text Domain: member_type
 Domain Path: /languages
@@ -19,6 +19,8 @@ class MemberTypePlugin {
         add_action( 'init', array($this, 'register_custom_post_type' ) );
         add_action( 'init', array($this, 'register_custom_taxonomy'));
         add_shortcode('team_members', array( $this, 'team_members_shortcode' ) );
+
+       // [team_members member_to_show='5' image_position='top' see_all_button=1 /]
     }
 
     public function register_styles() {
@@ -88,9 +90,18 @@ class MemberTypePlugin {
 
     public function team_members_shortcode( $shortcode_params ) {
 
-        //[team_members member_to_show='5' image_position='bottom' see_all_button='true' /]
+        if( is_array( $shortcode_params ) ){
+            $member_to_show = isset( $shortcode_params['member_to_show'] ) ? sanitize_text_field($shortcode_params['member_to_show'] ) : 5;
+            $image_position = isset( $shortcode_params['image_position'] ) ? sanitize_text_field( $shortcode_params['image_position'] ) : 'top';
+            $see_all_button =  isset( $shortcode_params['see_all_button'] ) ?sanitize_text_field( $shortcode_params['see_all_button'] ) : 1;
+        }else{
+            $member_to_show = 5;
+            $image_position = 'top';
+            $see_all_button = 1;
+        }
+
         $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
-        $posts_per_page =  isset( $shortcode_params['member_to_show'] ) ? $shortcode_params['member_to_show'] : 5; // 5 posts per page for first page
+        $posts_per_page =  $member_to_show; // 5 posts per page for first page
 
         $query_args = array(
             'post_type' => 'team_member',
@@ -99,37 +110,33 @@ class MemberTypePlugin {
         );
 
         $team_members_query = new WP_Query( $query_args );
-//        error_log( print_r( ['$team_members_query'=>$team_members_query], true ) );
-
-        //[team_members member_to_show='5' image_position='top' see_all_button=1 /]
 
         $output = '';
-
         if ($team_members_query->have_posts()) {
-            $output .= '<div class="team-members-holder"><div class="team-members">';
+            $output .= '<div class="MT-team-members-holder"><div class="MT-team-members">';
 
             while ( $team_members_query->have_posts() ) {
                 $team_members_query->the_post();
-                $output .= '<div class="team-member">';
-                if ( $shortcode_params['image_position'] === 'top' ) {
-                    $output .= '<a href="' . esc_url(get_permalink() ) . '"><div class="member-image">' . get_the_post_thumbnail() . '</div></a>';
+                $output .= '<div class="MT-team-member">';
+                if ( $image_position === 'top' ) {
+                    $output .= '<a href="' . esc_url(get_permalink() ) . '"><div class="MT-member-image">' . get_the_post_thumbnail() . '</div></a>';
                 }
-                $output .= '<div class="member-info">';
-                $output .= '<a href="' . esc_url( get_permalink() ) . '"><h2 class="member-name">' . get_the_title() . '</h2></a>';
+                $output .= '<div class="MT-member-info">';
+                $output .= '<a href="' . esc_url( get_permalink() ) . '"><h2 class="MT-member-name">' . get_the_title() . '</h2></a>';
 
                 // Get taxonomy terms
                 $taxonomy_terms = get_the_terms( get_the_ID(), 'member_type' );
                 if ($taxonomy_terms && !is_wp_error( $taxonomy_terms ) ) {
-                    $output .= '<div class="taxonomy-terms">';
+                    $output .= '<div class="MT-taxonomy-terms">';
                     foreach ( $taxonomy_terms as $term ) {
-                        $output .= '<span class="taxonomy-term">' . $term->name . '</span>';
+                        $output .= '<span class="MT-taxonomy-term">' . $term->name . '</span>';
                     }
                     $output .= '</div>';
                 }
 
                 $output .= '</div>';
-                if ( $shortcode_params['image_position'] === 'bottom' ) {
-                    $output .= '<a href="' . esc_url(get_permalink() ) . '"><div class="member-image">' . get_the_post_thumbnail() . '</div></a>';
+                if ( $image_position === 'bottom' ) {
+                    $output .= '<a href="' . esc_url(get_permalink() ) . '"><div class="MT-member-image">' . get_the_post_thumbnail() . '</div></a>';
                 }
                 $output .= '</div>';
             }
@@ -146,8 +153,8 @@ class MemberTypePlugin {
             ));
 
             // See All Button
-            if ( $shortcode_params['see_all_button'] ) {
-                $output .= '<div class="see_all_btn"><a href="' . get_post_type_archive_link('team_member') . '" class="see-all-button">See All Team Members</a></div>';
+            if ( $see_all_button ) {
+                $output .= '<div class="MT-see_all_btn"><a href="' . get_post_type_archive_link('team_member') . '" class="see-all-button">See All Team Members</a></div>';
             }
 
             wp_reset_postdata();

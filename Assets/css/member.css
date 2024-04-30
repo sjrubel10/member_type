@@ -1,11 +1,11 @@
-.team-members-holder{
+.MT-team-members-holder{
     display: block;
     float: left;
     position: relative;
     min-width: 100% !important;
     height: auto;
 }
-.team-members{
+.MT-team-members{
     width: 100%;
     position: relative;
     float: left;
@@ -13,7 +13,7 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
 
-.team-member{
+.MT-team-member{
     position: relative;
     float: left;
     width: calc(100% - 20px);
@@ -25,26 +25,26 @@
     height: 450px;
 }
 
-.member-info a{
+.MT-member-info a{
     text-decoration: none;
 }
-.member-info a:hover{
+.MT-member-info a:hover{
     text-decoration: underline;
 }
-.member-name{
+.MT-member-name{
     text-align: center;
     text-decoration: none;
 }
-.taxonomy-terms{
+.MT-taxonomy-terms{
     text-align: center;
 }
 
-.member-image img {
+.MT-member-image img {
     width: 100%;
     height: 250px;
     border-radius: 50%;
 }
-.see_all_btn{
+.MT-see_all_btn{
     text-align: center;
 }
 /*
